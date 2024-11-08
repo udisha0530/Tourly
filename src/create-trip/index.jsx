@@ -5,9 +5,9 @@ import {React,useState} from 'react';
 function Createtrip() {
   const [destination, setDestination] = useState('');
     const [suggestions, setSuggestions] = useState([]);
-    const [apiKey] = useState('7d11130ca0msh5a45a2a02528a79p14aec8jsn37a35dcda68a'); // Store your API key
+    const [apiKey] = useState('APIKEY'); // Store your API key
     const [isFetching, setIsFetching] = useState(false);
-    const [lastInputLength, setLastInputLength] = useState(0);
+    
 
   const fetchSuggestions = async (query) => {
     const endpoint = 'https://google-map-places.p.rapidapi.com/maps/api/place/autocomplete/json';
