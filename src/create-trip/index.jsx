@@ -1,13 +1,26 @@
-import { selectBudgetoption, selectTravelersList } from '@/constant/option';
-import {React,useState} from 'react';
+import { Button } from '@/components/button';
+import { AI_PROMPT, selectBudgetoption, selectTravelersList } from '@/constant/option';
+import { chatSession } from '@/service/AIModel';
+import { React, useState, useEffect } from 'react';
+import { toast } from 'sonner';
+
 
 
 function Createtrip() {
   const [destination, setDestination] = useState('');
     const [suggestions, setSuggestions] = useState([]);
-    const [apiKey] = useState('APIKEY'); // Store your API key
+    const [apiKey] = useState(import.meta.env.VITE_RAPID_GOOGLE_PLACES_API_KEY); // Store your API key
     const [isFetching, setIsFetching] = useState(false);
-    
+    const [formData,setFormData]=useState([])
+    const handleInputChange=(name,value)=>{
+      setFormData({
+        ...formData,
+        [name]:value
+      })
+    }
+     useEffect(() => {
+    console.log("Form data:", formData);
+  }, [formData]);
 
   const fetchSuggestions = async (query) => {
     const endpoint = 'https://google-map-places.p.rapidapi.com/maps/api/place/autocomplete/json';
@@ -19,6 +32,7 @@ function Createtrip() {
         'X-RapidAPI-Key': apiKey,
       },
     };
+    
 
     try {
       setIsFetching(true); // Set loading state
@@ -40,9 +54,11 @@ function Createtrip() {
     }
   };
 
-  const handleInputChange = (e) => {
+  const handlesearchInputChange = (e) => {
      const inputValue = e.target.value;
     setDestination(inputValue);
+    setDestination(inputValue);
+    handleInputChange('destination', inputValue);
     if (inputValue.length >=3 && inputValue.length % 3 === 0) {
     fetchSuggestions(inputValue); // Call API every two characters after the second one
   } else if (inputValue.length <= 2) {
@@ -52,8 +68,31 @@ function Createtrip() {
 
   const handleSuggestionClick = (suggestion) => {
     setDestination(suggestion.description); // Set the selected suggestion
+    handleInputChange('destination', suggestion.description);
     setSuggestions([]); // Clear suggestions after selection
   };
+  const OnGenerateTrip=async()=>{
+    if (formData?.noOfDays>5&&!formData?.destination||!formData?.budget||!formData?.travellers)
+    {
+      toast("Pls fill all details")
+      return ;
+    }
+
+    const FINAL_PROMPT=AI_PROMPT
+    .replace('{destination}',formData?.destination)
+    .replace('{noOfDays}',formData?.noOfDays)
+    .replace('{travellers}',formData?.travellers)
+    .replace('{budget}',formData?.budget)
+    .replace('{noOfDays}',formData?.noOfDays)
+    .replace('{destination}',formData?.destination)
+
+    console.log(FINAL_PROMPT)
+
+    const result=await chatSession.sendMessage(FINAL_PROMPT)
+
+    console.log(result?.response?.text());
+
+  }
   return (
     
     <div className="sm:px-10 md:px-32 lg:px-48 xl:px-56 px-5 mt-10 text-center bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
@@ -69,7 +108,7 @@ function Createtrip() {
           <input
             type="text"
             value={destination}
-            onChange={handleInputChange}
+            onChange={handlesearchInputChange}
             placeholder='Enter your destination'
             className="border border- gray-500 rounded-lg p-3 w-full h-14 text-lg text-gray-700 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary transition"
           />
@@ -98,44 +137,53 @@ function Createtrip() {
             type="number" 
             placeholder="Ex. 3" 
             className="border border-gray-300 rounded-lg p-3 w-full h-14 text-lg text-gray-700 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary transition"
+            onChange={(e)=>handleInputChange('noOfDays',e.target.value)}
           />
         </div>
 
         {/* Budget Selection */}
         <div>
           <h2 className="text-2xl font-semibold text-gray-700 mb-4">Choose your Budget</h2>
-          <div className="flex flex-wrap gap-5 justify-center">
+          <div className="grid grid-cols-3 gap-5 mt-5 ">
             {selectBudgetoption.map((item, index) => (
-              <button
-                key={index}
-                className="w-48 h-40 bg-white rounded-lg shadow-md p-5 flex flex-col items-center justify-center transition-transform transform hover:scale-105 hover:shadow-xl"
-              >
-                <div className="text-4xl text-primary mb-2">{item.icon}</div>
-                <h3 className="font-semibold text-lg text-gray-700">{item.title}</h3>
-                <p className="text-gray-500 text-center text-sm mt-1">{item.desc}</p>
-              </button>
+              <div key={index}  
+              onClick={()=>handleInputChange('budget',item.title)}
+              className={`p-4 border rounded-lg  bg-white transition-transform transform hover:scale-105 hover:shadow-xl
+                ${formData?.budget==item.title&&'shadow-lg border-black'}
+              `}>
+                <h2 className='text-4xl'>{item.icon}</h2>
+                <h2 className='font-bold text-lg'>{item.title}</h2>
+                <h2 className='text-gray-500  text-sm'>{item.desc}</h2>
+              </div>
             ))}
           </div>
         </div>
 
         {/* Travelers Selection */}
-        <div className="mt-10">
+        <div>
           <h2 className="text-2xl font-semibold text-gray-700 mb-4">Who are you travelling with?</h2>
-          <div className="flex flex-wrap gap-5 justify-center">
+          <div className="grid grid-cols-3 gap-5 mt-5 ">
             {selectTravelersList.map((item, index) => (
-              <button
-                key={index}
-                className="w-48 h-40 bg-white rounded-lg shadow-md p-5 flex flex-col items-center justify-center transition-transform transform hover:scale-105 hover:shadow-xl"
-              >
-                <div className="text-4xl text-primary mb-2">{item.icon}</div>
-                <h3 className="font-semibold text-lg text-gray-700">{item.title}</h3>
-                <p className="text-gray-500 text-center text-sm mt-1">{item.desc}</p>
-              </button>
+              <div key={index} 
+              onClick={()=>handleInputChange('travellers',item.people)}
+              className={`p-4 border rounded-lg  bg-white transition-transform transform hover:scale-105 hover:shadow-xl
+                ${formData?.travellers==item.people&&'shadow-lg border-black'}
+              `}>
+                <h2 className='text-4xl'>{item.icon}</h2>
+                <h2 className='font-bold text-lg'>{item.title}</h2>
+                <h2 className='text-gray-500  text-sm'>{item.desc}</h2>
+              </div>
             ))}
           </div>
         </div>
+        
       </div>
+      <div className='my-10 justify-end flex'>
+          <Button onClick={OnGenerateTrip}>Generate Trip</Button>
+        </div>
+
     </div>
+    
   );
 }
 
