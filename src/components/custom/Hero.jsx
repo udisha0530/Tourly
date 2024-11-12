@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 
 function Hero() {
   return (
-    <div className='flex flex-col items-center mx-56 gap-9 py-16 bg-gradient-to-r from-gray-100 to-gray-200 rounded-lg shadow-lg'>
+    <div className='flex flex-col items-center mx-56 gap-9 py-16 bg-gradient-to-r rounded-lg '>
       <h1 className='font-bold text-[60px] text-center'>
         <span className='text-[#f56551] text-center mt-16'>Personalised Itineraries at your fingertips</span>
       </h1>
