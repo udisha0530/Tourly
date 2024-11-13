@@ -3,9 +3,8 @@ import { AI_PROMPT, selectBudgetoption, selectTravelersList } from '@/constant/o
 import { React, useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { chatSession } from '@/service/AIModel';
-import { animate, scroll } from "motion";
+//import { animate, scroll } from "motion";
 import { FcGoogle } from "react-icons/fc";
-import { GoogleOAuthProvider, useGoogleLogin} from '@react-oauth/google';
 import {
   Dialog,
   DialogContent,
@@ -14,7 +13,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { LogIn } from 'lucide-react';
+import { GoogleOAuthProvider,useGoogleLogin } from '@react-oauth/google';
 import axios from 'axios';
 
 function Createtrip() {
@@ -30,7 +29,7 @@ function Createtrip() {
         [name]:value
       })
     }
-     useEffect(() => {
+    useEffect(() => {
     console.log("Form data:", formData);
   }, [formData]);
 
@@ -82,42 +81,55 @@ function Createtrip() {
   handleInputChange('destination', suggestion.description);
   setSuggestions([]); // Clear suggestions after selection
 };
-  const login=useGoogleLogin({
-    onSuccess:(codeResp)=>console.log(codeResp),
-    onError:(error)=>console.log(error)
-  })
   
-  const OnGenerateTrip = async () => {
-    const user = localStorage.getItem('user');
-    if (!user) {
+ const login=useGoogleLogin({
+  onSuccess:(codeResp)=>GetUserProfile(codeResp),
+  //onSuccess:(codeResp)=>console.log(codeResp),
+  onError:(error)=>(error)
+})
+
+   const OnGenerateTrip=async()=>{
+    
+    const user=localStorage.getItem('user');
+    if (!user){
       setOpenDailog(true);
       return;
     }
-  
-    if (formData?.noOfDays > 5 && (!formData?.destination || !formData?.budget || !formData?.travellers)) {
-      toast("Please enter all details");
+    if (formData?.noOfDays>5&&!formData?.destination||!formData?.budget||!formData?.travellers){
+      toast("please enter all details")
       return;
     }
-  
-    const FINAL_PROMPT = AI_PROMPT
-      .replace('{destination}', formData?.destination)
-      .replace('{noOfDays}', formData?.noOfDays)
-      .replace('{traveller}', formData?.travellers)
-      .replace('{budget}', formData?.budget)
-      .replace('{noOfDays}', formData?.noOfDays)
-      .replace('{destination}', formData?.destination);
+
+    const FINAL_PROMPT=AI_PROMPT
+    .replace('{destination}',formData?.destination)
+    .replace('{noOfDays}',formData?.noOfDays)
+    .replace('{traveller}',formData?.travellers)
+    .replace('{budget}',formData?.budget)
+    .replace('{noOfDays}',formData?.noOfDays)
+    .replace('{destination}',formData?.destination)
+
   
     console.log(FINAL_PROMPT);
-  
-    try {
-      const result = await chatSession.sendMessage(FINAL_PROMPT); // Ensure OnGenerateTrip is async
-      console.log(result?.response?.text());
-    } catch (error) {
-      console.error("Error generating trip:", error);
-    }
-  };
-  
+    const result=await chatSession.sendMessage(FINAL_PROMPT)
+    console.log(result?.response?.text());
 
+   }
+   
+   const GetUserProfile=(tokenInfo)=>{
+    axios.get(`https://www.googleapis.com/oauth2/v1/userinfo?acess_token=${tokenInfo?.access_token}`,{
+      headers:{
+        Authorization:`Bearer ${tokenInfo?.access_token}`,
+        Accept:'Application/json'
+      }
+    }).then((resp)=>{
+      console.log(resp);
+      localStorage.setItem('user',JSON.stringify(resp.data));
+      setOpenDailog(false);
+      OnGenerateTrip();
+    }).catch((error) => {
+  console.error("Error fetching user profile:", error.response || error.message);
+});
+   }
   return (
     
     <div className="sm:px-10 md:px-32 lg:px-48 xl:px-56 px-5 mt-10 text-center bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
@@ -212,7 +224,7 @@ function Createtrip() {
           <DialogDescription>
             <div className="flex items-center">
               <img src="/tourlogo.jpg" className="w-20 h-20 mr-3" />
-              <span className="text-lg font-bold italic text-black">Your Ultimate Tour Planner<span style={{ fontSize: '1.75em' }}>🛫</span></span>
+              <span className="text-lg font-bold italic text-black">Your Ultimate Tour Planner<span style={{ fontSize: '1.75em' }}>🛫</span> </span>
             </div>
             <h2 className="font-bold text-lg mt-7 text-black">Sign in with Google.</h2>
             <p className="text-black">Sign in to the app with google authentication.</p>
