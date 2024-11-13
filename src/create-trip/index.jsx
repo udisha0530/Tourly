@@ -1,17 +1,29 @@
 import { Button } from '@/components/button';
 import { AI_PROMPT, selectBudgetoption, selectTravelersList } from '@/constant/option';
-import { chatSession } from '@/service/AIModel';
 import { React, useState, useEffect } from 'react';
 import { toast } from 'sonner';
-
-
+import { chatSession } from '@/service/AIModel';
+import { animate, scroll } from "motion";
+import { FcGoogle } from "react-icons/fc";
+import { GoogleOAuthProvider, useGoogleLogin} from '@react-oauth/google';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { LogIn } from 'lucide-react';
+import axios from 'axios';
 
 function Createtrip() {
   const [destination, setDestination] = useState('');
     const [suggestions, setSuggestions] = useState([]);
     const [apiKey] = useState(import.meta.env.VITE_RAPID_GOOGLE_PLACES_API_KEY); // Store your API key
     const [isFetching, setIsFetching] = useState(false);
-    const [formData,setFormData]=useState([])
+    const [formData,setFormData]=useState([]);
+    const [openDailog,setOpenDailog]=useState(false);
     const handleInputChange=(name,value)=>{
       setFormData({
         ...formData,
@@ -32,7 +44,6 @@ function Createtrip() {
         'X-RapidAPI-Key': apiKey,
       },
     };
-    
 
     try {
       setIsFetching(true); // Set loading state
@@ -55,44 +66,58 @@ function Createtrip() {
   };
 
   const handlesearchInputChange = (e) => {
-     const inputValue = e.target.value;
-    setDestination(inputValue);
-    setDestination(inputValue);
-    handleInputChange('destination', inputValue);
-    if (inputValue.length >=3 && inputValue.length % 3 === 0) {
-    fetchSuggestions(inputValue); // Call API every two characters after the second one
-  } else if (inputValue.length <= 2) {
-    setSuggestions([]); // Clear suggestions if input is too short
-  }
-  };
+    const inputValue = e.target.value;
+   setDestination(inputValue);
+   setDestination(inputValue);
+   handleInputChange('destination', inputValue);
+   if (inputValue.length >=3 && inputValue.length % 3 === 0) {
+   fetchSuggestions(inputValue); // Call API every two characters after the second one
+ } else if (inputValue.length <= 2) {
+   setSuggestions([]); // Clear suggestions if input is too short
+ }
+ };
 
-  const handleSuggestionClick = (suggestion) => {
-    setDestination(suggestion.description); // Set the selected suggestion
-    handleInputChange('destination', suggestion.description);
-    setSuggestions([]); // Clear suggestions after selection
-  };
-  const OnGenerateTrip=async()=>{
-    if (formData?.noOfDays>5&&!formData?.destination||!formData?.budget||!formData?.travellers)
-    {
-      toast("Pls fill all details")
-      return ;
+ const handleSuggestionClick = (suggestion) => {
+  setDestination(suggestion.description); // Set the selected suggestion
+  handleInputChange('destination', suggestion.description);
+  setSuggestions([]); // Clear suggestions after selection
+};
+  const login=useGoogleLogin({
+    onSuccess:(codeResp)=>console.log(codeResp),
+    onError:(error)=>console.log(error)
+  })
+  
+  const OnGenerateTrip = async () => {
+    const user = localStorage.getItem('user');
+    if (!user) {
+      setOpenDailog(true);
+      return;
     }
+  
+    if (formData?.noOfDays > 5 && (!formData?.destination || !formData?.budget || !formData?.travellers)) {
+      toast("Please enter all details");
+      return;
+    }
+  
+    const FINAL_PROMPT = AI_PROMPT
+      .replace('{destination}', formData?.destination)
+      .replace('{noOfDays}', formData?.noOfDays)
+      .replace('{traveller}', formData?.travellers)
+      .replace('{budget}', formData?.budget)
+      .replace('{noOfDays}', formData?.noOfDays)
+      .replace('{destination}', formData?.destination);
+  
+    console.log(FINAL_PROMPT);
+  
+    try {
+      const result = await chatSession.sendMessage(FINAL_PROMPT); // Ensure OnGenerateTrip is async
+      console.log(result?.response?.text());
+    } catch (error) {
+      console.error("Error generating trip:", error);
+    }
+  };
+  
 
-    const FINAL_PROMPT=AI_PROMPT
-    .replace('{destination}',formData?.destination)
-    .replace('{noOfDays}',formData?.noOfDays)
-    .replace('{travellers}',formData?.travellers)
-    .replace('{budget}',formData?.budget)
-    .replace('{noOfDays}',formData?.noOfDays)
-    .replace('{destination}',formData?.destination)
-
-    console.log(FINAL_PROMPT)
-
-    const result=await chatSession.sendMessage(FINAL_PROMPT)
-
-    console.log(result?.response?.text());
-
-  }
   return (
     
     <div className="sm:px-10 md:px-32 lg:px-48 xl:px-56 px-5 mt-10 text-center bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
@@ -140,7 +165,7 @@ function Createtrip() {
             onChange={(e)=>handleInputChange('noOfDays',e.target.value)}
           />
         </div>
-
+                                                                       
         {/* Budget Selection */}
         <div>
           <h2 className="text-2xl font-semibold text-gray-700 mb-4">Choose your Budget</h2>
@@ -180,10 +205,30 @@ function Createtrip() {
       </div>
       <div className='my-10 justify-end flex'>
           <Button onClick={OnGenerateTrip}>Generate Trip</Button>
-        </div>
+      </div>
+      <Dialog open={openDailog}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogDescription>
+            <div className="flex items-center">
+              <img src="/tourlogo.jpg" className="w-20 h-20 mr-3" />
+              <span className="text-lg font-bold italic text-black">Your Ultimate Tour Planner<span style={{ fontSize: '1.75em' }}>🛫</span></span>
+            </div>
+            <h2 className="font-bold text-lg mt-7 text-black">Sign in with Google.</h2>
+            <p className="text-black">Sign in to the app with google authentication.</p>
+            <Button 
+            onClick={login}
+            className="w-full mt-5">
+              <FcGoogle />&nbsp; <span className="text-white">Sign In With Google.</span>
+            </Button>
+          </DialogDescription>
+        </DialogHeader>
+       </DialogContent>
+     </Dialog>
+
+
 
     </div>
-    
   );
 }
 
