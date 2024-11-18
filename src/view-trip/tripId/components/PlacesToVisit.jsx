@@ -16,13 +16,11 @@ function PlacesToVisit({ trip }) {
                 <div className='space-y-4'>
                   {dayPlan.plan.map((place, idx) => (
                     <div key={idx} className='p-4 bg-white border border-gray-300 rounded-lg shadow hover:shadow-lg transition-shadow duration-200 flex flex-col md:flex-row md:items-start'>
-                      {place.placeImageUrl && (
-                        <img
-                          src={place.placeImageUrl}
-                          alt={place.placeName}
-                          className='rounded-lg w-full md:w-1/3 object-cover mb-3 md:mb-0 md:mr-4 h-40'
-                        />
-                      )}
+                      <img
+                        src='/thumbnail4.jpg' // Display only the default image
+                        alt='Default Preview'
+                        className='rounded-lg w-full md:w-1/3 object-cover mb-3 md:mb-0 md:mr-4 h-40'
+                      />
                       <div className='flex-1'>
                         <h3 className='font-medium text-xl text-gray-800 mb-1'>{place.placeName}</h3>
                         <p className='text-gray-600 mb-2 leading-relaxed'>{place.placeDetails}</p>
