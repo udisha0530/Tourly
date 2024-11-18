@@ -27,7 +27,7 @@ function PlacesToVisit({ trip }) {
                         <h3 className='font-medium text-xl text-gray-800 mb-1'>{place.placeName}</h3>
                         <p className='text-gray-600 mb-2 leading-relaxed'>{place.placeDetails}</p>
                         <div className='text-sm text-gray-500 space-y-1'>
-                          <p>⏱️ Time to Travel: <span className='font-medium'>{place.timeToTravel}</span></p>
+                          <p>⏱ Time to Travel: <span className='font-medium'>{place.timeToTravel}</span></p>
                           <p>💵 Ticket Pricing: <span className='font-medium'>{place.ticketPricing}</span></p>
                         </div>
                       </div>
