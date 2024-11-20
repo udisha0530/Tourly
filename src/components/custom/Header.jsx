@@ -96,7 +96,7 @@ function Header() {
           </Popover>
         </div>
       ) : (
-        <Button onClick={() => setOpenDailog(true)}>Sign In</Button>
+        <Button onClick={() => setOpenDailog(true)}>Sign Up</Button>
       )}
     </div>
 
