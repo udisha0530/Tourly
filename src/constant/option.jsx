@@ -20,21 +20,29 @@ export const selectTravelersList = [
         icon: '👨‍👩‍👧‍👦',
         people: '3 to 5 people',
     },
+
+    {
+        id: 4,
+        title: 'Friends',
+        desc: 'Fun and adventure for your daring group.',
+        icon: '👣🤝🍹',
+        people: '5 or more',
+    },
 ];
 
 export const selectBudgetoption = [
     {
         id: 1,
-        title: 'Budget',
+        title: 'Cheap',
         desc: 'Affordable and economical travel',
-        icon: '💰',
+        icon: '💵',
         range: 'Under 10000',
     },
     {
         id: 2,
         title: 'Standard',
         desc: 'Moderate budget with good comfort',
-        icon: '💵',
+        icon: '💰',
         range: '10000 - 30000',
     },
     {
@@ -45,3 +53,5 @@ export const selectBudgetoption = [
         range: 'Above 30000',
     },
 ];
+
+export const AI_PROMPT='Generate Travel Plan for Location: {destination},for {noOfDays} Days for {traveller} with a {budget} budget ,Give me a Hotels options list with HotelName, Hotel address, Price, hotel image url, geo coordinates, rating, descriptions and suggest itinerary with placeName, Place Details, Place Image Url, Geo Coordinates, ticket Pricing, Time to travel each of the {destination} for {noOfDays} days with each day plan with best time to visit in JSON format.'
