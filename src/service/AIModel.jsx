@@ -1,0 +1,41 @@
+import {
+    GoogleGenerativeAI
+  } from "@google/generative-ai";
+  
+  
+  const apiKey = import.meta.env.VITE_GOOGLE_GEMINI_AI_API_KEY;
+  
+  const genAI = new GoogleGenerativeAI(apiKey);
+  
+  const model = genAI.getGenerativeModel({
+    model: "gemini-1.5-flash",
+  });
+  
+  const generationConfig = {
+    temperature: 1,
+    topP: 0.95,
+    topK: 64,
+    maxOutputTokens: 8192,
+    responseMimeType: "application/json",
+  };
+  
+  
+   export const chatSession = model.startChat({
+      generationConfig,
+      history: [
+        {
+          role: "user",
+          parts: [
+            {text: "Generate Travel Plan for Location: Las Vegas, for 3 Days for Couple with a Cheap budget ,Give me a Hotels options list with HotelName, Hotel address, Price, hotel image url, geo coordinates, rating, descriptions and suggest itinerary with placeName, Place Details, Place Image Url, Geo Coordinates, ticket Pricing, Time to travel each of the location for 3 days with each day plan with best time to visit in JSON format."},
+          ],
+        },
+        {
+          role: "model",
+          parts: [
+            {
+              text: 'json\n{\n  "hotels": [\n    {\n      "hotelName": "The D Las Vegas",\n      "hotelAddress": "301 Fremont Street, Las Vegas, NV 89101",\n      "price": "$50 - $100 per night",\n      "hotelImageUrl": "https://www.the-d.com/sites/default/files/styles/hero_image/public/2019-05/D-Hotel-Exterior-2.jpg?itok=X8sL0a8a",\n      "geoCoordinates": "36.1699° N, 115.1398° W",\n      "rating": "3.5 stars",\n      "description": "A budget-friendly casino hotel located in the heart of Fremont Street Experience."\n    },\n    {\n      "hotelName": "Golden Nugget Las Vegas",\n      "hotelAddress": "129 E Fremont Street, Las Vegas, NV 89101",\n      "price": "$70 - $150 per night",\n      "hotelImageUrl": "https://www.goldennugget.com/las-vegas/media/images/hotel/golden-nugget-las-vegas-exterior.jpg",\n      "geoCoordinates": "36.1695° N, 115.1405° W",\n      "rating": "4 stars",\n      "description": "A historic hotel with a casino, pool, and several dining options."\n    },\n    {\n      "hotelName": "Circus Circus Hotel & Casino",\n      "hotelAddress": "2880 Las Vegas Blvd S, Las Vegas, NV 89109",\n      "price": "$40 - $80 per night",\n      "hotelImageUrl": "https://media.nomadicmatt.com/2018/03/Circus-Circus-Hotel-Las-Vegas-Exterior-Daytime.jpg",\n      "geoCoordinates": "36.1228° N, 115.1709° W",\n      "rating": "3 stars",\n      "description": "A family-friendly hotel with a circus theme, a midway, and affordable rooms."\n    },\n    {\n      "hotelName": "Main Street Station Casino, Brewery & Hotel",\n      "hotelAddress": "200 N Main Street, Las Vegas, NV 89101",\n      "price": "$40 - $80 per night",\n      "hotelImageUrl": "https://www.mainstreetstationcasino.com/sites/default/files/styles/hero/public/2019-06/hotel-lobby.jpg",\n      "geoCoordinates": "36.1715° N, 115.1393° W",\n      "rating": "3.5 stars",\n      "description": "A historic hotel with a railroad theme, a brewery, and a casino."\n    },\n    {\n      "hotelName": "El Cortez Hotel & Casino",\n      "hotelAddress": "600 Fremont Street, Las Vegas, NV 89101",\n      "price": "$50 - $100 per night",\n      "hotelImageUrl": "https://www.elcortezhotelcasino.com/sites/default/files/styles/image_full/public/exterior_1.jpg",\n      "geoCoordinates": "36.1698° N, 115.1379° W",\n      "rating": "3.5 stars",\n      "description": "A historic hotel with a vintage charm, a casino, and a classic diner."\n    }\n  ],\n  "itinerary": {\n    "day": {\n      "day1": {\n        "bestTime": "Morning",\n        "plan": [\n          {\n            "placeName": "Fremont Street Experience",\n            "placeDetails": "Walk the pedestrian-friendly street, enjoy free live entertainment, and marvel at the Viva Vision light show.",\n            "placeImageUrl": "https://www.fremontstreetexperience.com/media/images/viva-vision-light-show.jpg",\n            "geoCoordinates": "36.1699° N, 115.1398° W",\n            "ticketPricing": "Free",\n            "timeToTravel": "2 hours"\n          },\n          {\n            "placeName": "The Mob Museum",\n            "placeDetails": "Explore the history of organized crime in America through exhibits and artifacts.",\n            "placeImageUrl": "https://www.themobmuseum.org/images/landing-hero-desktop.jpg",\n            "geoCoordinates": "36.1697° N, 115.1413° W",\n            "ticketPricing": "$25 - $30",\n            "timeToTravel": "2 hours"\n          },\n          {\n            "placeName": "Golden Gate Casino",\n            "placeDetails": "Enjoy a budget-friendly dinner at the Golden Gate\'s 1906 Bar, which holds a Guinness World Record for the smallest casino in the world.",\n            "placeImageUrl": "https://www.goldengate.com/images/homepage/exterior.jpg",\n            "geoCoordinates": "36.1695° N, 115.1405° W",\n            "ticketPricing": "N/A",\n            "timeToTravel": "1 hour"\n          }\n        ]\n      },\n      "day2": {\n        "bestTime": "Afternoon",\n        "plan": [\n          {\n            "placeName": "Bellagio Conservatory & Botanical Garden",\n            "placeDetails": "Admire the stunning floral displays, which change seasonally.",\n            "placeImageUrl": "https://www.bellagio.com/content/dam/bellagio/images/conservatory/2023/Winter/Winter-07-4.jpg",\n            "geoCoordinates": "36.1172° N, 115.1721° W",\n            "ticketPricing": "Free",\n            "timeToTravel": "1 hour"\n          },\n          {\n            "placeName": "The Venetian & The Palazzo",\n            "placeDetails": "Take a gondola ride through the Grand Canal Shoppes, browse luxury stores, and enjoy a free performance at the Venetian Theatre.",\n            "placeImageUrl": "https://www.venetian.com/content/dam/venetian/images/hero-banners/Venetian-Palazzo-Exterior.jpg",\n            "geoCoordinates": "36.1150° N, 115.1727° W",\n            "ticketPricing": "Gondola ride: $30 - $40",\n            "timeToTravel": "3 hours"\n          },\n          {\n            "placeName": "Caesars Palace",\n            "placeDetails": "Enjoy free live music at the Forum Shops, explore the Roman-themed casino, and take photos with the famous statues.",\n            "placeImageUrl": "https://www.caesars.com/content/dam/caesars/images/hotels/caesars-palace-las-vegas/caesars-palace-exterior.jpg",\n            "geoCoordinates": "36.1168° N, 115.1712° W",\n            "ticketPricing": "Free",\n            "timeToTravel": "2 hours"\n          }\n        ]\n      },\n      "day3": {\n        "bestTime": "Morning",\n        "plan": [\n          {\n            "placeName": "Hoover Dam",\n            "placeDetails": "Take a day trip to the iconic dam, a marvel of engineering and a popular tourist destination.",\n            "placeImageUrl": "https://www.nps.gov/media/photo/original/0064c993-006b-47b1-b039-d7e28119ab6a.jpg",\n            "geoCoordinates": "36.0286° N, 114.9758° W",\n            "ticketPricing": "Entrance fee: $30 per vehicle",\n            "timeToTravel": "4 hours (round trip)"\n          },\n          {\n            "placeName": "Red Rock Canyon National Conservation Area",\n            "placeDetails": "Hike or drive through scenic landscapes, enjoy rock climbing, and admire the red sandstone formations.",\n            "placeImageUrl": "https://www.blm.gov/sites/blm.gov/files/styles/medium/public/featured-images/RedRock_21.jpg",\n            "geoCoordinates": "36.1871° N, 115.2751° W",\n            "ticketPricing": "Entrance fee: $15 per vehicle",\n            "timeToTravel": "3 hours"\n          },\n          {\n            "placeName": "Downtown Container Park",\n            "placeDetails": "Shop for unique souvenirs, enjoy live music, and grab dinner at a food truck.",\n            "placeImageUrl": "https://www.downtowncontainerpark.com/content/uploads/2020/09/downtown-container-park-image-2.jpg",\n            "geoCoordinates": "36.1655° N, 115.1401° W",\n            "ticketPricing": "Free",\n            "timeToTravel": "2 hours"\n          }\n        ]\n      }\n    }\n  }\n}\n\n\n',
+            },
+          ],
+        },
+      ],
+    });
